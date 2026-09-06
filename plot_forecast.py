@@ -6,6 +6,7 @@ Usage:
         --out plot_eurusd_daily.png --history 120
 """
 import argparse
+from datetime import datetime, timezone
 
 import matplotlib
 
@@ -13,6 +14,12 @@ matplotlib.use("Agg")  # headless-safe for CI
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+def to_datenum(times):
+    return mdates.date2num(
+        np.array([datetime.fromtimestamp(int(t), tz=timezone.utc) for t in times])
+    )
 
 
 def load_csv(path):
@@ -56,14 +63,14 @@ def main():
 
     fig, ax = plt.subplots(figsize=(11, 5.5))
     ax.plot(
-        mdates.epoch2num(hist_t),
+        to_datenum(hist_t),
         hist,
         color="#1f77b4",
         linewidth=1.4,
         label="History (close)",
     )
     ax.plot(
-        mdates.epoch2num(fut_t),
+        to_datenum(fut_t),
         med,
         color="#d62728",
         linewidth=1.8,
@@ -72,7 +79,7 @@ def main():
     )
     if q10 is not None and q90 is not None:
         ax.fill_between(
-            mdates.epoch2num(fut_t),
+            to_datenum(fut_t),
             q10,
             q90,
             color="#d62728",
@@ -80,7 +87,7 @@ def main():
             label="10th–90th percentile",
         )
     ax.axvline(
-        mdates.epoch2num(base),
+        to_datenum([base])[0],
         color="#555555",
         linewidth=0.8,
         linestyle="--",
