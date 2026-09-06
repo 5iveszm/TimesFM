@@ -37,6 +37,14 @@ jobs:
         run: |
           python forecast.py --csv data/eurusd_4h.csv --horizon 48 --context 1024 --device cpu
 
+      - name: Forecast daily XAUUSD (14 days)
+        run: |
+          python forecast.py --csv data/xauusd_daily.csv --horizon 14 --context 1024 --device cpu
+
+      - name: Forecast 4H XAUUSD (48 bars)
+        run: |
+          python forecast.py --csv data/xauusd_4h.csv --horizon 48 --context 1024 --device cpu
+
       - name: Plot daily forecast
         run: |
           python plot_forecast.py --csv data/eurusd_daily.csv \
@@ -48,6 +56,18 @@ jobs:
           python plot_forecast.py --csv data/eurusd_4h.csv \
             --forecast data/eurusd_4h_forecast_48.csv \
             --out data/plot_eurusd_4h.png --history 150
+
+      - name: Plot daily XAUUSD
+        run: |
+          python plot_forecast.py --csv data/xauusd_daily.csv \
+            --forecast data/xauusd_daily_forecast_14.csv \
+            --out data/plot_xauusd_daily.png --history 120
+
+      - name: Plot 4H XAUUSD
+        run: |
+          python plot_forecast.py --csv data/xauusd_4h.csv \
+            --forecast data/xauusd_4h_forecast_48.csv \
+            --out data/plot_xauusd_4h.png --history 150
 
       - name: Upload results
         uses: actions/upload-artifact@v4
