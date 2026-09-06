@@ -31,15 +31,27 @@ def load_csv(path):
 
 
 def evaluate(model, contexts, horizon):
-    out = model.predict_batch(
-        contexts=contexts,
-        horizon=horizon,
-        return_quantiles=True,
-        use_symmetric_averaging=False,
+    outs = list(
+        model.predict_batch(
+            contexts=contexts,
+            horizon=horizon,
+            return_quantiles=True,
+            use_symmetric_averaging=False,
+        )
     )
-    med = out["median"].T  # (horizon, batch)
-    q10 = out["quantiles"][:, :, 0].T
-    q90 = out["quantiles"][:, :, 2].T
+    n = len(outs)
+    med = np.zeros((horizon, n))
+    q10 = np.zeros((horizon, n))
+    q90 = np.zeros((horizon, n))
+    for w, out in enumerate(outs):
+        f = np.asarray(out.forecast).reshape(horizon)
+        q = np.asarray(out.quantiles)  # (horizon, num_quantiles)
+        if q.ndim == 3:  # multivariate path
+            q = q[0]
+        mid = q.shape[-1] // 2
+        med[:, w] = f
+        q10[:, w] = q[:, 0]
+        q90[:, w] = q[:, -1]
     return med, q10, q90
 
 
