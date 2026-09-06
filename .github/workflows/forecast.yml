@@ -3,16 +3,12 @@ name: TimesFM-3 Forex Forecast
 on:
   workflow_dispatch:
   schedule:
-    # Daily 04:00 UTC — adjust to your preference.
     - cron: '0 4 * * *'
 
 jobs:
   forecast:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    env:
-      HF_HUB_ETAG_TIMEOUT: '30'
-      PYTHONUNBUFFERED: '1'
     defaults:
       run:
         working-directory: .
@@ -28,23 +24,36 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
 
-      - name: Install TimesFM
+      - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Forecast daily EURUSD
+      - name: Forecast daily EURUSD (14 days)
         run: |
           python forecast.py --csv data/eurusd_daily.csv --horizon 14 --context 1024 --device cpu
 
-      - name: Forecast 4H EURUSD
+      - name: Forecast 4H EURUSD (48 bars)
         run: |
           python forecast.py --csv data/eurusd_4h.csv --horizon 48 --context 1024 --device cpu
 
-      - name: Upload forecasts
+      - name: Plot daily forecast
+        run: |
+          python plot_forecast.py --csv data/eurusd_daily.csv \
+            --forecast data/eurusd_daily_forecast_14.csv \
+            --out data/plot_eurusd_daily.png --history 120
+
+      - name: Plot 4H forecast
+        run: |
+          python plot_forecast.py --csv data/eurusd_4h.csv \
+            --forecast data/eurusd_4h_forecast_48.csv \
+            --out data/plot_eurusd_4h.png --history 150
+
+      - name: Upload results
         uses: actions/upload-artifact@v4
         with:
           name: forecasts
           path: |
             data/*_forecast_*.csv
+            data/plot_*.png
           if-no-files-found: error

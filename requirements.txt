@@ -1,1 +1,2 @@
 timesfm[torch]>=3.0.1
+matplotlib

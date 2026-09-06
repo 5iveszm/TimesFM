@@ -188,11 +188,17 @@ def main():
     # Also dump machine-readable CSV.
     out_csv = args.csv.replace(".csv", f"_forecast_{args.horizon}.csv")
     with open(out_csv, "w") as fh:
-        fh.write("horizon," + ",".join(f"{n}_median" for n in names) + "\n")
+        qcols = []
+        for name in names:
+            qcols += [f"{name}_q10", f"{name}_median", f"{name}_q90"]
+        fh.write("horizon," + ",".join(qcols) + "\n")
         for hh in range(args.horizon):
             row = [str(hh + 1)]
             for name in names:
-                row.append(f"{results[name][hh]['median']:.8f}")
+                r = results[name][hh]
+                row.append(f"{r['q10']:.8f}")
+                row.append(f"{r['median']:.8f}")
+                row.append(f"{r['q90']:.8f}")
             fh.write(",".join(row) + "\n")
     print(f"\nForecast written to {out_csv}")
 
