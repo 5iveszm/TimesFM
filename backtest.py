@@ -99,6 +99,7 @@ def main():
     total = np.zeros(args.horizon, dtype=float)
     below_q10 = np.zeros(args.horizon, dtype=float)
     below_med = np.zeros(args.horizon, dtype=float)
+    below_q90 = np.zeros(args.horizon, dtype=float)
     err_mae = np.zeros(args.horizon)
     err_rmse = np.zeros(args.horizon)
     bias = np.zeros(args.horizon)
@@ -114,6 +115,7 @@ def main():
             inside[hh] += lo <= a <= hi
             below_q10[hh] += a < lo
             below_med[hh] += a < m
+            below_q90[hh] += a < hi
             e = abs(a - m)
             err_mae[hh] += e
             err_rmse[hh] += e * e
