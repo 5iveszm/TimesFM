@@ -14,6 +14,7 @@ Usage:
     python backtest.py --symbol EURUSD=X --tf D --horizon 7 --samples 40
 """
 import argparse
+import os
 
 import numpy as np
 from timesfm3 import ModelConfig, TimesFM3Evaluator
